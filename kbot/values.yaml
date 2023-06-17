@@ -1,18 +1,14 @@
 replicaCount: 1
-
 image:
   repository: ottomen
-  tag: "v.1.0.0-cca475c"
+  tag: "-"
   arch: linux/amd64
-
 service:
   type: ClusterIP
   port: 8080
-
 secret:
   name: "kbot"
   env: "TELE_TOKEN"
   key: "token"
-
 securityContext:
   privileged: true

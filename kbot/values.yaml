@@ -1,7 +1,7 @@
 replicaCount: 1
 image:
   repository: ottomen
-  tag: "v.1.0.0-0ca3e41"
+  tag: "v.1.0.0-e518ad6"
   arch: linux/amd64
 service:
   type: ClusterIP

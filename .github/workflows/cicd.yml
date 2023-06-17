@@ -2,6 +2,9 @@ name: KBOT-CICD
 
 on: push
 
+permissions:
+  contents: write
+
 jobs:
   ci:
     name: CI
@@ -29,10 +32,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
         with:
           fetch-depth: 0
-          token: ${{ secrets.PAT }}
       - run: echo "VERSION=$(shell git describe --tags --abbrev=0)-$(shell git rev-parse --short HEAD)" >> $GITHUB_ENV
 
       - uses: mikefarah/yq@master
@@ -43,4 +45,4 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git commit -am "update version $VERSION"
-          git push https://${{ secrets.PAT }}@github.com/ottomen/devops-6w-t1.git
+          git push

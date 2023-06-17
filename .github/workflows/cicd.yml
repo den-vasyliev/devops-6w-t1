@@ -21,13 +21,13 @@ jobs:
         run: make test
       - name: Log in to registry
         run: echo "${{ secrets.GT_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-        
+
       - name: Build and push to ghcr.io
         run: make image-linux push-linux
         env:
           REGISTRY: ghcr.io
 
-      - run: echo "VERSION=$(git describe --tags --abbrev=0)-$(git rev-parse --short HEAD)" >> $GITHUB_ENV    
+      - run: echo "VERSION=$(git describe --tags --abbrev=0)-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
       - uses: mikefarah/yq@master
         with:
@@ -45,17 +45,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set up kubeconfig
-        run: echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
-        shell: bash
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
 
       - name: Install ArgoCD CLI
         run: |
-          curl -sSL -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+          kubectl create namespace argocd
+          kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
           chmod +x /usr/local/bin/argocd
 
       - name: Deploy ArgoCD to Kubernetes
         run: |
-          kubectl config use-context ${{ secrets.KUBERNETES_CONTEXT }}
-          argocd login ${{ secrets.ARGOCD_SERVER }} --username ${{ secrets.ARGOCD_USERNAME }} --password ${{ secrets.ARGOCD_PASSWORD }}
-          argocd app set ottomenbot --image ghcr.io/ottomen/ottomenbot:${{ github.sha }}
+          kubectl config use-context argocd
+          kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
+          kubectl port-forward svc/argocd-server -n argocd 8080:443
+          echo "PASS=$(argocd admin initial-password -n argocd)"
+          argocd login https://localhost:8080 --username admin --password $PASS
+          argocd app set ottomenbot --image ghcr.io/ottomen/ottomenbot:$VERSION
           argocd app sync ottomenbot

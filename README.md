@@ -37,3 +37,7 @@ where the specified fields correspond to the parameters of the helm chart:
 
 **Send the response as a link to the container image.**
 Example response: ghcr.io/den-vasyliev/kbot:v1.0.0-106879e-linux-amd64
+
+### Workflow process
+
+It is pretty straightforward:

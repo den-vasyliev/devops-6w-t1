@@ -44,10 +44,18 @@ jobs:
     needs: build_and_push
     runs-on: ubuntu-latest
     steps:
-      - name: Set up kubeconfig
+      - name: Set up k8s minikube
         run: |
-          mkdir -p ~/.kube
-          echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
+          curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-darwin-amd64
+          sudo install minikube-darwin-amd64 /usr/local/bin/minikube
+          minikube start --driver=docker
+
+      - name: Install kubectl
+        run: |
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          mkdir -p ~/.local/bin
+          mv ./kubectl ~/.local/bin/kubectl
 
       - name: Install ArgoCD CLI
         run: |

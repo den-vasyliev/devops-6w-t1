@@ -1,7 +1,7 @@
 APP_NAME=ottomenbot
 REGISTRY=ghcr.io
 VERSION=$(shell git describe --tags --abbrev=0)-$(shell git rev-parse --short HEAD)
-NAME=$(APP_NAME)-$(VERSION)
+NAME=$(APP_NAME):$(VERSION)
 TARGET_OS=darwin
 TARGET_ARCH=arm64
 IMAGE_NAME=$(REGISTRY)/ottomen/$(NAME)
@@ -51,19 +51,19 @@ windows:
 ###############################################################################	
 
 image: 
-	docker build . -t $(IMAGE_NAME)  --build-arg build_type=linux
+	docker build . -t $(IMAGE_NAME) --build-arg build_type=linux
 
 image-linux: 
-	docker build . -t $(IMAGE_NAME):linux-arm64  --build-arg build_type=linux
+	docker build . -t $(IMAGE_NAME)-linux-amd64  --build-arg build_type=linux
 
 image-arm: 
-	docker build . -t $(IMAGE_NAME):arm-arm64  --build-arg build_type=arm
+	docker build . -t $(IMAGE_NAME)-arm-arm64  --build-arg build_type=arm
 
 image-macOS: 
-	docker build . -t $(IMAGE_NAME):macOS-arm64 --build-arg build_type=macOS
+	docker build . -t $(IMAGE_NAME)-macOS-arm64 --build-arg build_type=macOS
 
 image-windows: 
-	docker build . -t $(IMAGE_NAME):windows-x64 --build-arg build_type=windows
+	docker build . -t $(IMAGE_NAME)-windows-x64 --build-arg build_type=windows
 
 
 ###############################################################################
@@ -71,16 +71,16 @@ image-windows:
 ###############################################################################	
 
 push-linux: 
-	docker push $(IMAGE_NAME):linux-arm64	
+	docker push $(IMAGE_NAME)-linux-amd64	
 
 push-arm: 
-	docker push $(IMAGE_NAME):arm-arm64	
+	docker push $(IMAGE_NAME)-arm-arm64	
 
 push-macOS: 
-	docker push $(IMAGE_NAME):macOS-arm64	
+	docker push $(IMAGE_NAME)-macOS-arm64	
 
 push-windows: 
-	docker push $(IMAGE_NAME):windows-x64
+	docker push $(IMAGE_NAME)-windows-x64
 
 
 ###############################################################################

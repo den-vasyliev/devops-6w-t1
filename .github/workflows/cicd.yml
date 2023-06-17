@@ -36,5 +36,3 @@ jobs:
       - uses: mikefarah/yq@master
         with:
           cmd: yq -i '.image.tag=strenv(VERSION)' kbot/values.yaml
-    env:
-      VERSION: ${{ env.VERSION }}

@@ -1,10 +1,10 @@
 APP_NAME=ottomenbot
-REGISTRY=ottomen
+REGISTRY=ghcr.io
 VERSION=$(shell git describe --tags --abbrev=0)-$(shell git rev-parse --short HEAD)
-NAME=ottomenbot-$(VERSION)
+NAME=$(APP_NAME)-$(VERSION)
 TARGET_OS=darwin
 TARGET_ARCH=arm64
-IMAGE_NAME=$(REGISTRY)/$(NAME)
+IMAGE_NAME=$(REGISTRY)/ottomen/$(NAME)
 
 
 ###############################################################################

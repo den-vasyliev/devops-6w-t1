@@ -46,3 +46,50 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git commit -am "update version $VERSION"
           git push
+
+      - name: Install GitHub CLI
+        run: |
+          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
+          sudo apt-add-repository https://cli.github.com/packages
+          sudo apt update
+          sudo apt install gh
+
+      - name: Make Github release
+        uses: actions/github-script@v3
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const version = $VERSION;
+            const chartName = 'ottomenbot-$VERSION.tgz';
+            const filePath = path.join(process.cwd(), chartName);
+
+            // Create a release
+            const release = await github.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: $VERSION,
+              name: $VERSION,
+              body: `Release $VERSION`,
+              target_commitish: 'develop'
+            });
+
+            // Check if file exists
+            if (fs.existsSync(filePath)) {
+              // Upload release asset
+              const { data: { upload_url: uploadUrl } } = release;
+              await github.repos.uploadReleaseAsset({
+                url: uploadUrl,
+                headers: {
+                  'content-length': fs.statSync(filePath).size,
+                  'content-type': 'application/gzip',
+                },
+                name: path.basename(filePath),
+                file: fs.readFileSync(filePath),
+              });
+            } else {
+              console.warn(`File ${chartName} not found`);
+            }
+        env:
+          VERSION: $VERSION
+          GITHUB_TOKEN: ${{ secrets.PAT }}

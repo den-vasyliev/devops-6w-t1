@@ -24,7 +24,7 @@ format:
 	gofmt -s -w .
 
 build: format test deps
-	CGO_ENABLED=0 GOOS=$(TARGET_OS) GOARCH=$(TARGET_ARCH) go build -v -o $(APP_NAME) -ldflags "-X="github.com/ottomen/ottomenbot/cmd.appVersion=$(VERSION)
+	CGO_ENABLED=0 GOOS=$(TARGET_OS) GOARCH=$(TARGET_ARCH) go build -v -o $(APP_NAME) -ldflags "-X="github.com/ottomen/devops-6w-t1/cmd.appVersion=$(VERSION)
 
 run:
 	go run main.go ottomenbot

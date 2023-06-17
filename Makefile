@@ -1,4 +1,4 @@
-APP_NAME=kbot
+APP_NAME=ottomenbot
 REGISTRY=ottomen
 VERSION=$(shell git describe --tags --abbrev=0)-$(shell git rev-parse --short HEAD)
 NAME=ottomenbot-$(VERSION)

@@ -1,12 +1,15 @@
 name: KBOT-CICD
 
-on: push
+on:
+  push:
+    branches:
+      - develop
 
 permissions:
   contents: write
 
 jobs:
-  ci:
+  build_and_push:
     name: CI
     runs-on: ubuntu-latest
     steps:
@@ -22,17 +25,35 @@ jobs:
         run: make image-linux push-linux
         env:
           REGISTRY: ghcr.io
-  cd:
-    name: CD
-    needs: ci
-    runs-on: ubuntu-latest
-    steps:
-      - name: Package HELM chart
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - run: echo "VERSION=$(git describe --tags --abbrev=0)-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
       - uses: mikefarah/yq@master
         with:
           cmd: yq -i '.image.tag=strenv(VERSION)' helm/values.yaml
+
+      - run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git commit -am "Update image tag to $VERSION"
+          git tag $VERSION
+          git push origin $VERSION
+  deploy:
+    name: CD
+    needs: build_and_push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up kubeconfig
+        uses: azure/setup-kubectl@v1
+        with:
+          version: "v1.18.8"
+
+      - name: Install ArgoCD CLI
+        run: |
+          curl -sSL -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+          chmod +x /usr/local/bin/argocd
+
+      - name: Deploy ArgoCD to Kubernetes
+        run: |
+          kubectl config use-context my-context
+          argocd login my-argocd-server
+          argocd app set ottomenbot --image ghcr.io/ottomen/ottomenbot:${{ github.sha }}
+          argocd app sync ottomenbot

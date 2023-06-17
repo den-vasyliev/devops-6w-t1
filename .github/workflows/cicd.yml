@@ -42,9 +42,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set up kubeconfig
-        uses: azure/setup-kubectl@v1
-        with:
-          version: "v1.18.8"
+        run: echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
+        shell: bash
 
       - name: Install ArgoCD CLI
         run: |
@@ -53,7 +52,7 @@ jobs:
 
       - name: Deploy ArgoCD to Kubernetes
         run: |
-          kubectl config use-context my-context
-          argocd login my-argocd-server
+          kubectl config use-context ${{ secrets.KUBERNETES_CONTEXT }}
+          argocd login ${{ secrets.ARGOCD_SERVER }} --username ${{ secrets.ARGOCD_USERNAME }} --password ${{ secrets.ARGOCD_PASSWORD }}
           argocd app set ottomenbot --image ghcr.io/ottomen/ottomenbot:${{ github.sha }}
           argocd app sync ottomenbot

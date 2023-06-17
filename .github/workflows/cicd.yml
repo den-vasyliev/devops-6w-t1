@@ -21,10 +21,13 @@ jobs:
         run: make test
       - name: Log in to registry
         run: echo "${{ secrets.GT_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        
       - name: Build and push to ghcr.io
         run: make image-linux push-linux
         env:
           REGISTRY: ghcr.io
+
+      - run: echo "VERSION=$(git describe --tags --abbrev=0)-$(git rev-parse --short HEAD)" >> $GITHUB_ENV    
 
       - uses: mikefarah/yq@master
         with:

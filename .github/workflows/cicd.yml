@@ -22,11 +22,7 @@ jobs:
         env:
           APP: "ottomenbot/kbot"
           REGISTRY: ${{ secrets.DOCKER_USERNAME }}
-        with:
-          push: true
-          tags: ottomenbot/kbot:latest
         run: make image-linux push-linux
-        uses: docker/build-push-action@v2
   cd:
     name: CD
     needs: ci

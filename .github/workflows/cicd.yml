@@ -43,4 +43,4 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git commit -am "update version $VERSION"
-          git push
+          git push https://${{ secrets.PAT }}@github.com/ottomen/devops-6w-t1.git

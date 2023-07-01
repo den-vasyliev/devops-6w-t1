@@ -1,8 +1,9 @@
 replicaCount: 1
 image:
   repository: ottomen
-  tag: ""
-  arch: linux/amd64
+  tag: "v.1.0.0-38eede1"
+  arch: amd64
+  os: linux
 service:
   type: ClusterIP
   port: 8080
